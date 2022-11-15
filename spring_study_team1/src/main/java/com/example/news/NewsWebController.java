@@ -2,6 +2,7 @@ package com.example.news;
 
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.List;
 
 
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +39,41 @@ public class NewsWebController {
 		this.dao = dao;
 	}
 	
+	@GetMapping("/update/{aid}")
+	public String update(@PathVariable int aid, Model m) {
+		News news = null;
+		try {
+			news = dao.getNews(aid);
+			m.addAttribute("news", news);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			logger.info("뉴스 로드 과정에서 문제 발생");
+			m.addAttribute("error", "뉴스를 정상적으로 가져오지 못했습니다.");
+		}
+		return "news/newsUpdateForm";
+	}
+	
+	
+	@PostMapping("/update/{aid}")
+	public String updateNews(@PathVariable int aid, @ModelAttribute News news, Model m, @RequestParam("file") MultipartFile file) {
+		try {
+			File dest = new File(fdir+"/"+file.getOriginalFilename());
+			
+			// 파일 저장
+			file.transferTo(dest);
+			// 이미지 파일 이름을 News 객체에도 저장
+			news.setImg(dest.getName());
+			
+			dao.updateNews(aid, news);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.warn("뉴스 수정 과정에서 문제 발생");
+			m.addAttribute("error", "뉴스가 정상적으로 수정되지 않았습니다.");
+		}
+		return "news/newsView";
+	}
+	
+	
 	@PostMapping("/add")
 	public String addNews(@ModelAttribute News news, Model m, @RequestParam("file") MultipartFile file) {
 		try {
@@ -47,7 +84,6 @@ public class NewsWebController {
 			// 파일 저장
 			file.transferTo(dest);
 			// 이미지 파일 이름을 News 객체에도 저장
-			
 			news.setImg(dest.getName());
 			
 			dao.addNews(news);
@@ -55,7 +91,6 @@ public class NewsWebController {
 			e.printStackTrace();
 			logger.info("뉴스 추가 과정에서 문제 발생");
 			m.addAttribute("error", "뉴스가 정상적으로 등록되지 않았습니다.");
-			
 		}
 		
 		return "redirect:/news/list";

@@ -4,7 +4,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +23,19 @@ public class NewsApiController {
 		this.dao = dao;
 	}
 
+	
+	@PatchMapping("{aid}")
+	public String updateNews(@PathVariable("aid") int aid, @RequestBody News news) {
+		try {
+			dao.updateNews(aid, news);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return "News API: 뉴스 수정 실패!!";
+		}
+		return "News API: 뉴스 수정 성공!";
+	}
+	
+	
 	@PostMapping
 	public String addNews(@RequestBody News news) {
 		try {
@@ -32,7 +47,7 @@ public class NewsApiController {
 		return "News API: 뉴스 등록 성공!";
 	}
 	
-	@PostMapping("{aid}")
+	@DeleteMapping("{aid}")
 	public String delNews(@PathVariable("aid") int aid) {
 		try {
 			dao.delNews(aid);

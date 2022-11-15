@@ -16,6 +16,7 @@ public class NewsDAO {
 	final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
 	final String JDBC_URL = "jdbc:oracle:thin:@localhost:1521:xe";
 	
+	
 	// DB 연결을 가져오는 메서드, DBCP를 사용하는 것이 좋음
 	public Connection open() {
 		Connection conn = null;
@@ -72,7 +73,7 @@ public class NewsDAO {
 		}
 	}
 	
-public void addNews(News n) throws Exception {
+	public void addNews(News n) throws Exception {
 		Connection conn = open();
 		
 		String sql ="insert into news(aid,title,img,regdate,content) "
@@ -87,6 +88,8 @@ public void addNews(News n) throws Exception {
 		}
 	}
 	
+	
+	
 	public void delNews(int aid) throws SQLException {
 		Connection conn = open();
 		
@@ -100,5 +103,21 @@ public void addNews(News n) throws Exception {
 				throw new SQLException("DB에러");
 			}
 		}
+	}
+
+	public void updateNews(int aid, News n) throws SQLException {
+		Connection conn = open();
+		
+		String sql = "update news set title = ?, img = ?, content = ? where aid = ?";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		
+		try(conn; pstmt){
+			pstmt.setString(1, n.getTitle());
+			pstmt.setString(2, n.getImg());
+			pstmt.setString(3, n.getContent());
+			pstmt.setInt(4, aid);
+			pstmt.executeUpdate();
+		}
+		
 	}
 }

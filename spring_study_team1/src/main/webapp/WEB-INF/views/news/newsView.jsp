@@ -22,8 +22,10 @@
 	    </div>
     </div>
     <hr>
-    <a href="javascript:history.back()" class="btn btn-primary"><< Back</a>
-    
+    <div class="d-flex justify-content-between">
+      <a href="/news/list" class="btn btn-primary"><< Back</a>
+      <a href="/news/update/${news.aid}" class="btn btn-success"> 수정</a>
     </div>
+  </div>
     </body>
 </html>
